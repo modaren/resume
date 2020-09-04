@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分片上传</title>
+</head>
+
+<body>
+  <input type="file" name="file" id="file">
+  <button onclick="submit()">上传</button>
+  <script>
+    function submit() {
+      const fileDom = document.getElementById("file");
+      const fileData = fileDom.files[0];
+      uploadFile(fileData)
+    }
+
+    function uploadFile(file) {
+      // 默认设置片段大小,1M
+      const partSize = 1024 * 1024;
+      // 片段总数
+      const partCount = Math.ceil(file.size / partSize);
+      // 已上传片段数
+      let uploadPartCount = 0;
+
+      // 异步读取文件
+      const fileReader = new FileReader();
+      
+      let blob = file.slice(0, partSize);
+      
+      function name() {
+        const xhr = new XMLHttpRequest(); 
+        xhr.open("post", 'http://localhost:8888/upload');
+        xhr.onreadstatechange = function () {
+          console.log('ss')
+        }
+        xhr.onload = e => {
+    console.log('request success');
+};
+        const form = new FormData();
+        form.append('file', blob);
+          form.append('count', partCount);
+          form.append('uploadPartCount', uploadPartCount);
+          form.append('type', file.name.split('.')[1]);
+          form.append('name', file.name.split('.')[0]);
+          xhr.send(form);
+        }
+        name()
+
+
+      // fileReader.readAsBinaryString(blob);
+      // fileReader.onload = function (e) {
+      //   const xhr = new XMLHttpRequest(); 
+      //   xhr.open("post", 'http://localhost:8888/upload');
+
+      //   xhr.onreadstatechange = function () {
+      //     if (xhr.readyState === 4 && xhr.status === 200) {
+      //       ++uploadPartCount;
+      //       if (uploadPartCount === partCount) {
+      //         alerrt("上传完成");
+      //       } else if (uploadPartCount === partCount - 1) {
+      //         blob = file.slice(uploadPartCount * partSize, file.size);
+      //         fileReader.readAsBinaryString(blob);
+      //       } else {
+      //         blob = file.slice(uploadPartCount * partSize, (uploadPartCount + 1) * partSize);
+      //         fileReader.readAsBinaryString(blob);
+      //       }
+      //     } else {
+      //       alert("上传出错")
+      //     }
+      //   }
+
+      //   // 发送数据
+      //   if (xhr.sendAsBinary) {
+      //     xhr.sendAsBinary(e.target.result);
+      //   } else {
+      //     const form = new FormData();
+      //     form.append('file', e.target.result);
+      //     form.append('count', partCount);
+      //     form.append('uploadPartCount', uploadPartCount);
+      //     form.append('type', file.name.split('.')[1]);
+      //     form.append('name', file.name.split('.')[0]);
+      //     xhr.send(form);
+      //   }
+
+      // }
+    }
+  </script>
+</body>
+
+</html>
